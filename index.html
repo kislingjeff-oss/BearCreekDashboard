@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bear Creek Interest Groups</title>
+<style>
+  :root{
+    --bc-bg:#e6e8ee;
+    --bc-panel:#fafbfc;
+    --bc-border:#c3c6d0;
+    --bc-fg:#14161c;
+    --bc-fg-muted:#4b5160;
+    --bc-accent:#2e4b3c;
+    --bc-accent-fg:#ffffff;
+    --bc-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --bc-font-serif: Georgia, "Times New Roman", serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bc-bg);
+    color:var(--bc-fg);
+    font-family:var(--bc-font-sans);
+    line-height:1.45;
+  }
+  .bc-page{
+    max-width:1040px;
+    margin:0 auto;
+    padding:28px 20px 60px;
+  }
+  .bc-header{
+    margin-bottom:22px;
+  }
+  .bc-header h1{
+    font-family:var(--bc-font-serif);
+    font-size:1.7rem;
+    margin:0 0 4px;
+  }
+  .bc-header .bc-takeaway{
+    color:var(--bc-fg-muted);
+    font-size:0.95rem;
+    margin:0;
+  }
+  .bc-static-note{
+    display:inline-block;
+    margin-top:10px;
+    font-size:0.78rem;
+    color:var(--bc-fg-muted);
+    background:var(--bc-panel);
+    border:1px solid var(--bc-border);
+    border-radius:6px;
+    padding:4px 10px;
+  }
+  .bc-section{
+    background:var(--bc-panel);
+    border:1px solid var(--bc-border);
+    border-radius:10px;
+    padding:18px 18px 20px;
+    margin-bottom:22px;
+  }
+  .bc-section h2{
+    font-size:1.1rem;
+    margin:0 0 2px;
+  }
+  .bc-section .bc-sub{
+    color:var(--bc-fg-muted);
+    font-size:0.85rem;
+    margin:0 0 14px;
+  }
+  .bc-filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .bc-filters input[type="search"],
+  .bc-filters select{
+    font-family:inherit;
+    font-size:0.88rem;
+    padding:6px 10px;
+    border:1px solid var(--bc-border);
+    border-radius:6px;
+    background:#fff;
+    color:var(--bc-fg);
+  }
+  .bc-filters input[type="search"]{
+    flex:1 1 200px;
+    min-width:160px;
+  }
+  table.bc-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.88rem;
+  }
+  table.bc-table th, table.bc-table td{
+    text-align:left;
+    padding:8px 10px;
+    border-bottom:1px solid var(--bc-border);
+    vertical-align:top;
+  }
+  table.bc-table th{
+    cursor:pointer;
+    user-select:none;
+    color:var(--bc-fg-muted);
+    font-weight:600;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+    white-space:nowrap;
+  }
+  table.bc-table th.bc-sorted::after{
+    content:" " attr(data-dir);
+  }
+  table.bc-table tbody tr{
+    cursor:pointer;
+  }
+  table.bc-table tbody tr:hover{
+    background:rgba(46,75,60,0.06);
+  }
+  table.bc-table tbody tr.bc-selected{
+    background:rgba(46,75,60,0.12);
+  }
+  .bc-pill{
+    display:inline-block;
+    font-size:0.74rem;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .bc-pill-filled{background:#dcebe1;color:#1f4a34;}
+  .bc-pill-vacant{background:#f3dede;color:#7a2222;}
+  .bc-pill-open{background:#e4e8f6;color:#2b3a78;}
+  .bc-pill-other{background:#eceef2;color:var(--bc-fg-muted);}
+  .bc-records-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .bc-records-list li{
+    border-bottom:1px solid var(--bc-border);
+    padding:10px 0;
+  }
+  .bc-records-list li:last-child{border-bottom:none;}
+  .bc-rec-meta{
+    font-size:0.78rem;
+    color:var(--bc-fg-muted);
+    margin-bottom:2px;
+  }
+  .bc-rec-role{
+    font-weight:600;
+    color:var(--bc-accent);
+  }
+  .bc-empty{
+    color:var(--bc-fg-muted);
+    font-size:0.88rem;
+    font-style:italic;
+  }
+  .bc-toggle-btn{
+    font-family:inherit;
+    font-size:0.82rem;
+    padding:5px 12px;
+    border:1px solid var(--bc-border);
+    border-radius:6px;
+    background:#fff;
+    color:var(--bc-fg);
+    cursor:pointer;
+  }
+  .bc-toggle-btn:hover{
+    background:rgba(46,75,60,0.06);
+  }
+  .bc-section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .bc-admin-flag{
+    font-size:0.72rem;
+    font-weight:700;
+    color:var(--bc-accent);
+  }
+  .bc-groups-cell{
+    color:var(--bc-fg-muted);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bc-bg:#1b1d22;
+      --bc-panel:#25282f;
+      --bc-border:#3a3e47;
+      --bc-fg:#eceef2;
+      --bc-fg-muted:#a7acb8;
+      --bc-accent:#7fbf9f;
+      --bc-accent-fg:#102015;
+    }
+    table.bc-table input[type="search"], .bc-filters select{
+      background:#1b1d22;
+      color:var(--bc-fg);
+    }
+    .bc-pill-filled{background:#1f3a2c;color:#9fdcb8;}
+    .bc-pill-vacant{background:#3a2323;color:#e3a3a3;}
+    .bc-pill-open{background:#232a4a;color:#a9b4ea;}
+    .bc-pill-other{background:#2b2e36;color:var(--bc-fg-muted);}
+  }
+</style>
+</head>
+<body>
+<div class="bc-page">
+
+  <div class="bc-header">
+    <h1>Bear Creek Interest Groups</h1>
+    <p class="bc-takeaway">Who holds what, what's open, and the notes behind each role &mdash; a snapshot for Bear Creek Friends Meeting.</p>
+    <span class="bc-static-note">Read-only snapshot &middot; generated 2026-10-18</span>
+  </div>
+
+  <div class="bc-section">
+    <h2>Roles &amp; Interest Groups</h2>
+    <p class="bc-sub">Click a row to see its records below. Click a column heading to sort.</p>
+    <div class="bc-filters">
+      <input type="search" id="bc-search" placeholder="Search roles, holders, notes&hellip;">
+      <select id="bc-filter-category"><option value="">All categories</option></select>
+      <select id="bc-filter-status"><option value="">All statuses</option></select>
+      <select id="bc-filter-remote"><option value="">All (remote-friendly)</option></select>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="bc-table" id="bc-table">
+        <thead>
+          <tr>
+            <th data-key="name">Role</th>
+            <th data-key="category">Category</th>
+            <th data-key="holdersText">Holder(s)</th>
+            <th data-key="status">Status</th>
+            <th data-key="remote">Remote?</th>
+          </tr>
+        </thead>
+        <tbody id="bc-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bc-section" id="bc-records-section">
+    <div class="bc-section-head">
+      <div>
+        <h2 id="bc-records-title">Records</h2>
+        <p class="bc-sub" id="bc-records-sub">Select a role above, or choose a report view.</p>
+      </div>
+      <div class="bc-filters" style="margin-bottom:0;">
+        <select id="bc-report-view">
+          <option value="role">Selected role</option>
+          <option value="all">All records</option>
+          <option value="deadlines">With a deadline</option>
+          <option value="by-person">By recorder</option>
+        </select>
+        <select id="bc-person-filter" style="display:none;"><option value="">All recorders</option></select>
+      </div>
+    </div>
+    <ul class="bc-records-list" id="bc-records-list"></ul>
+  </div>
+
+  <div class="bc-section" id="bc-users-section">
+    <div class="bc-section-head">
+      <div>
+        <h2>Users</h2>
+        <p class="bc-sub">People set up to use the live dashboard, and which interest groups they belong to.</p>
+      </div>
+      <button class="bc-toggle-btn" id="bc-users-toggle" type="button">Show</button>
+    </div>
+    <div style="overflow-x:auto; display:none;" id="bc-users-table-wrap">
+      <table class="bc-table" id="bc-users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Interest groups</th>
+          </tr>
+        </thead>
+        <tbody id="bc-users-table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DATA = {"roles": [{"id": "clerk", "name": "Clerk", "category": "Standing Role", "holders": ["Jackie Leckband"], "status": "Filled", "remote": "Partly", "notes": "Presides at business meeting; also currently holds Religious Education/Spiritual Enrichment, Funeral & Memorial, and Hospitality."}, {"id": "asst-recording-clerk", "name": "Assistant / Recording Clerk", "category": "Standing Role", "holders": [], "status": "Vacant", "remote": "Yes", "notes": "No one in this seat. Faith and Practice assumes a Clerk plus this role; drafting minutes and routine correspondence is doable entirely by a remote Friend."}, {"id": "treasurer", "name": "Treasurer", "category": "Standing Role", "holders": ["Osa Bricker"], "status": "Filled", "remote": "Mostly", "notes": "Keeps account of all funds; annual audit recommended."}, {"id": "asst-treasurer", "name": "Assistant Treasurer", "category": "Standing Role", "holders": [], "status": "Vacant", "remote": "Mostly", "notes": "No backup currently knows the location of records and bank accounts."}, {"id": "recorder", "name": "Recorder", "category": "Standing Role", "holders": ["Win Standing"], "status": "Filled", "remote": "Partly", "notes": "Maintains membership records; reports to the yearly meeting's statistical recorder."}, {"id": "ministry-counsel", "name": "Ministry and Counsel", "category": "Committee", "holders": ["Stan Sanders", "Marion Love", "Russ Leckband"], "status": "Filled", "remote": "Partly", "notes": "Pastoral care and the State of the Meeting Report."}, {"id": "house-grounds", "name": "House and Grounds", "category": "Committee", "holders": ["Russ Leckband", "Stan Sanders"], "status": "Filled", "remote": "No", "notes": "Property and meetinghouse upkeep, including hybrid-meeting technology."}, {"id": "peace-social", "name": "Peace and Social Concerns", "category": "Committee", "holders": [], "status": "No standing committee", "remote": "Partly", "notes": "Reports made directly at business meeting as \"the meeting as a whole\" rather than through a dedicated committee."}, {"id": "outreach-website", "name": "Outreach and Website", "category": "Committee", "holders": ["Jeff Kisling", "Jennie Cisar"], "status": "Filled", "remote": "Yes", "notes": "Newsletter and website; more hands wanted to ease rotation."}, {"id": "re-spiritual", "name": "Religious Education / Spiritual Enrichment", "category": "Committee", "holders": ["Liz Oppenheimer", "Jackie Leckband"], "status": "Filled", "remote": "Partly", "notes": "Recently renamed from Religious Education and Spiritual Development."}, {"id": "funeral-memorial", "name": "Funeral and Memorial", "category": "Committee", "holders": ["Win Standing", "Jackie Leckband", "Jenny Cisar", "Nancy Osborn Johnsen"], "status": "Filled", "remote": "Partly", "notes": "Plans for final services; kept as its own standing committee with co-clerks."}, {"id": "library-archivist", "name": "Library / Historian-Archivist", "category": "Committee", "holders": ["Nancy Osborn Johnsen"], "status": "Filled", "remote": "No", "notes": "Compiled Bear Creek's historical narrative of the meetinghouse."}, {"id": "trustees", "name": "Trustees", "category": "Standing Role", "holders": ["Osa Bricker", "Russ Leckband"], "status": "Filled", "remote": "No", "notes": "Legal/corporate responsibility for meeting property."}, {"id": "hospitality", "name": "Hospitality Committee", "category": "Committee", "holders": ["Jackie Leckband", "Win Standing"], "status": "Filled", "remote": "Partly", "notes": "Governs use of Cottage and Meetinghouse; carries Midyear Meeting hosting."}, {"id": "nominating", "name": "Nominating Committee", "category": "Committee", "holders": [], "status": "Ad hoc / unclear if active", "remote": "Partly", "notes": "Reconstituted periodically as need arises, per Faith and Practice p. 55."}, {"id": "safe-archive", "name": "Safe / Archive Review", "category": "Committee", "holders": [], "status": "No standing committee", "remote": "Mostly", "notes": "Faith and Practice recommends an annual committee for historical records; none currently assigned."}, {"id": "minute-taker", "name": "Minute-taker (business meeting)", "category": "Remote-Friendly Task", "holders": [], "status": "Open", "remote": "Yes", "notes": "Follows business meeting on Zoom; drafts the minute live or right after for the Recording Clerk to review."}, {"id": "zoom-host", "name": "Zoom Host", "category": "Remote-Friendly Task", "holders": [], "status": "Open", "remote": "Yes", "notes": "Manages waiting room, screen-share, mute/unmute for hybrid worship and business meeting. Rotation-friendly."}, {"id": "deadline-tracker", "name": "Deadline Tracker / Correspondence", "category": "Remote-Friendly Task", "holders": [], "status": "Open", "remote": "Yes", "notes": "Tracks IYM(C) report deadlines, State of the Meeting, Query responses, Midyear prep, apportionment."}, {"id": "query-coordinator", "name": "Query Response Coordinator", "category": "Remote-Friendly Task", "holders": [], "status": "Open", "remote": "Yes", "notes": "Collects written reflections from Friends and compiles Bear Creek's Query response document. Currently lands on the Clerk by default."}, {"id": "safe-transcription", "name": "Safe / Archive Transcription", "category": "Remote-Friendly Task", "holders": [], "status": "Open", "remote": "Mostly", "notes": "Someone at the meetinghouse photographs documents; remote Friends transcribe, describe, and catalog them from photos."}, {"id": "prairie-awakening-doc", "name": "Prairie Awakening Documentation", "category": "Remote-Friendly Task", "holders": [], "status": "Open", "remote": "Mostly", "notes": "Russ and Jackie hold the 30-year relationship; organizers have a standing invitation for help documenting the event each year."}, {"id": "newsletter-support", "name": "Newsletter / Outreach Support", "category": "Remote-Friendly Task", "holders": ["Jeff Kisling", "Jennie Cisar"], "status": "Open for more hands", "remote": "Yes", "notes": "Jeff and Jennie already do this; drafting one newsletter a quarter is a low-commitment way in."}], "records": [{"id": "r01", "roleId": "clerk", "date": "1972", "deadline": "", "description": "Homer Moffitt served as Clerk of Bear Creek Monthly Meeting (letter to Jeff re: his break with Selective Service, on file).", "createdBy": "Jeff Kisling"}, {"id": "r02", "roleId": "clerk", "date": "2022-02", "deadline": "", "description": "iymc.org's meeting directory still lists Jeff Kisling as Clerk \u2014 last updated February 2022, now out of date (Jackie Leckband is the current Clerk).", "createdBy": "Jeff Kisling"}, {"id": "r03", "roleId": "peace-social", "date": "1972", "deadline": "", "description": "Jeff's Selective Service correspondence was supported \"on behalf of the Peace Committee of Bear Creek Monthly Meeting.\"", "createdBy": "Jeff Kisling"}, {"id": "r04", "roleId": "house-grounds", "date": "2022-03-20", "deadline": "", "description": "House and Grounds report: plumbing/fixture age, basement ceiling and window repair, well-water quality/filtration, hybrid-meeting technology, exterior ramp project, donated ceiling fan reassignment.", "createdBy": "Russ Leckband and Stan Sanders"}, {"id": "r05", "roleId": "ministry-counsel", "date": "2021-01-17", "deadline": "", "description": "Earlier Nominating Committee roster showed Ministry and Counsel as Russ Leckband, Stan Sanders, and Cheryl Sutton (Cheryl has since transferred to another meeting).", "createdBy": "Bear Creek Nominating Committee"}, {"id": "r06", "roleId": "nominating", "date": "2021-01-17", "deadline": "", "description": "Nominating Committee slate proposed for 2022, including the Ministry & Counsel and Religious Education rosters.", "createdBy": "Bear Creek Nominating Committee"}, {"id": "r07", "roleId": "nominating", "date": "2021-01-17", "deadline": "", "description": "Raised, in its own report, whether each committee's responsibilities should be spelled out in writing \u2014 left unresolved.", "createdBy": "Bear Creek Nominating Committee"}, {"id": "r08", "roleId": "library-archivist", "date": "2023-01-28", "deadline": "", "description": "Compiled a detailed, sourced historical narrative of the meetinghouse (its 1916 move from Earlham, the 1994 renovation).", "createdBy": "Nancy Osborn Johnsen"}, {"id": "r09", "roleId": "safe-archive", "date": "2026-08-20", "deadline": "", "description": "Blog post clarifying that the historical safe was inaccessible (locked), not deliberately unopened or withheld.", "createdBy": "Jeff Kisling"}, {"id": "r10", "roleId": "prairie-awakening-doc", "date": "2026-08-26", "deadline": "", "description": "Blog post: the Prairie Awakening relationship is personal, not institutional, and \"cannot be inherited\" by the meeting.", "createdBy": "Jeff Kisling"}, {"id": "r11", "roleId": "prairie-awakening-doc", "date": "2026-09-04", "deadline": "", "description": "Working note on Prairie Awakening organizers' standing invitation to help document the event; how documentation has been handled in practice remains unsettled.", "createdBy": "Jeff Kisling"}], "users": [{"id": "alan-blakestad", "name": "Alan Blakestad", "groups": [], "isAdmin": false}, {"id": "august-kalinosky", "name": "August Kalinosky", "groups": [], "isAdmin": false}, {"id": "bear-creek-nominating-committee", "name": "Bear Creek Nominating Committee", "groups": ["nominating"], "isAdmin": false}, {"id": "doug-mankins", "name": "Doug Mankins", "groups": [], "isAdmin": false}, {"id": "greg-blumhagen", "name": "Greg Blumhagen", "groups": [], "isAdmin": false}, {"id": "jackie-leckband", "name": "Jackie Leckband", "groups": ["clerk", "re-spiritual", "hospitality", "funeral-memorial"], "isAdmin": true}, {"id": "jeff-kisling", "name": "Jeff Kisling", "groups": ["outreach-website", "newsletter-support"], "isAdmin": true}, {"id": "jennie-cisar", "name": "Jennie Cisar", "groups": ["outreach-website", "newsletter-support", "funeral-memorial"], "isAdmin": false}, {"id": "jon-tesdell", "name": "Jon Tesdell", "groups": [], "isAdmin": false}, {"id": "karen-morey", "name": "Karen Morey", "groups": [], "isAdmin": false}, {"id": "kate-moos", "name": "Kate Moos", "groups": [], "isAdmin": false}, {"id": "liz-oppenheimer", "name": "Liz Oppenheimer", "groups": ["re-spiritual"], "isAdmin": false}, {"id": "lisa-blumhagen", "name": "Lisa Blumhagen", "groups": [], "isAdmin": false}, {"id": "marion-love", "name": "Marion Love", "groups": ["ministry-counsel"], "isAdmin": false}, {"id": "nancy-osborn-johnsen", "name": "Nancy Osborn Johnsen", "groups": ["library-archivist", "funeral-memorial"], "isAdmin": false}, {"id": "nat-case", "name": "Nat Case", "groups": [], "isAdmin": false}, {"id": "osa-bricker", "name": "Osa Bricker", "groups": ["treasurer", "trustees"], "isAdmin": false}, {"id": "randy-kisling", "name": "Randy Kisling", "groups": [], "isAdmin": false}, {"id": "russ-leckband", "name": "Russ Leckband", "groups": ["ministry-counsel", "house-grounds", "trustees"], "isAdmin": false}, {"id": "sonja-sponheim", "name": "Sonja Sponheim", "groups": [], "isAdmin": false}, {"id": "stan-sanders", "name": "Stan Sanders", "groups": ["ministry-counsel", "house-grounds"], "isAdmin": false}, {"id": "win-standing", "name": "Win Standing", "groups": ["recorder", "funeral-memorial", "hospitality"], "isAdmin": false}]};
+
+  var roles = DATA.roles || [];
+  var records = DATA.records || [];
+  var users = DATA.users || [];
+
+  var GROUP_NAMES = {};
+  roles.forEach(function(r){ GROUP_NAMES[r.id] = r.name; });
+
+  function holdersText(r){
+    return (r.holders || []).join(", ");
+  }
+  roles.forEach(function(r){ r.holdersText = holdersText(r); });
+
+  function pillClass(status){
+    if(!status) return "bc-pill-other";
+    var s = status.toLowerCase();
+    if(s.indexOf("filled") !== -1) return "bc-pill-filled";
+    if(s.indexOf("vacant") !== -1) return "bc-pill-vacant";
+    if(s.indexOf("open") !== -1) return "bc-pill-open";
+    return "bc-pill-other";
+  }
+
+  function escapeHtml(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // ---------- Roles table ----------
+  var sortKey = "name";
+  var sortDir = 1;
+  var selectedRoleId = null;
+
+  var searchEl = document.getElementById("bc-search");
+  var filterCategoryEl = document.getElementById("bc-filter-category");
+  var filterStatusEl = document.getElementById("bc-filter-status");
+  var filterRemoteEl = document.getElementById("bc-filter-remote");
+  var tableBody = document.getElementById("bc-table-body");
+
+  function setupFilterOptions(){
+    var cats = {}, stats = {}, remotes = {};
+    roles.forEach(function(r){
+      if(r.category) cats[r.category] = true;
+      if(r.status) stats[r.status] = true;
+      if(r.remote) remotes[r.remote] = true;
+    });
+    function fill(sel, obj){
+      Object.keys(obj).sort().forEach(function(v){
+        var o = document.createElement("option");
+        o.value = v; o.textContent = v;
+        sel.appendChild(o);
+      });
+    }
+    fill(filterCategoryEl, cats);
+    fill(filterStatusEl, stats);
+    fill(filterRemoteEl, remotes);
+  }
+
+  function filteredSortedRoles(){
+    var q = (searchEl.value || "").toLowerCase().trim();
+    var cat = filterCategoryEl.value;
+    var stat = filterStatusEl.value;
+    var rem = filterRemoteEl.value;
+    var rows = roles.filter(function(r){
+      if(cat && r.category !== cat) return false;
+      if(stat && r.status !== stat) return false;
+      if(rem && r.remote !== rem) return false;
+      if(q){
+        var hay = [r.name, r.category, r.holdersText, r.status, r.remote, r.notes].join(" ").toLowerCase();
+        if(hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+    rows.sort(function(a,b){
+      var av = (a[sortKey] || "").toString().toLowerCase();
+      var bv = (b[sortKey] || "").toString().toLowerCase();
+      if(av < bv) return -1 * sortDir;
+      if(av > bv) return 1 * sortDir;
+      return 0;
+    });
+    return rows;
+  }
+
+  function renderTable(){
+    var rows = filteredSortedRoles();
+    tableBody.innerHTML = "";
+    rows.forEach(function(r){
+      var tr = document.createElement("tr");
+      tr.dataset.id = r.id;
+      if(r.id === selectedRoleId) tr.classList.add("bc-selected");
+      tr.innerHTML =
+        "<td>" + escapeHtml(r.name) + "</td>" +
+        "<td>" + escapeHtml(r.category) + "</td>" +
+        "<td>" + (r.holdersText ? escapeHtml(r.holdersText) : '<span class="bc-empty">none</span>') + "</td>" +
+        '<td><span class="bc-pill ' + pillClass(r.status) + '">' + escapeHtml(r.status) + "</span></td>" +
+        "<td>" + escapeHtml(r.remote) + "</td>";
+      tr.addEventListener("click", function(){
+        selectedRoleId = r.id;
+        document.getElementById("bc-report-view").value = "role";
+        document.getElementById("bc-person-filter").style.display = "none";
+        renderTable();
+        renderRecordsPanel();
+      });
+      tableBody.appendChild(tr);
+    });
+  }
+
+  document.querySelectorAll("#bc-table thead th").forEach(function(th){
+    th.addEventListener("click", function(){
+      var key = th.dataset.key;
+      if(sortKey === key){
+        sortDir *= -1;
+      } else {
+        sortKey = key;
+        sortDir = 1;
+      }
+      document.querySelectorAll("#bc-table thead th").forEach(function(h){
+        h.classList.remove("bc-sorted");
+        h.removeAttribute("data-dir");
+      });
+      th.classList.add("bc-sorted");
+      th.setAttribute("data-dir", sortDir === 1 ? "▲" : "▼");
+      renderTable();
+    });
+  });
+
+  [searchEl, filterCategoryEl, filterStatusEl, filterRemoteEl].forEach(function(el){
+    el.addEventListener("input", renderTable);
+    el.addEventListener("change", renderTable);
+  });
+
+  // ---------- Records panel ----------
+  var reportViewEl = document.getElementById("bc-report-view");
+  var personFilterEl = document.getElementById("bc-person-filter");
+  var recordsTitle = document.getElementById("bc-records-title");
+  var recordsSub = document.getElementById("bc-records-sub");
+  var recordsList = document.getElementById("bc-records-list");
+
+  function setupPersonOptions(){
+    var people = {};
+    records.forEach(function(r){ if(r.createdBy) people[r.createdBy] = true; });
+    Object.keys(people).sort().forEach(function(p){
+      var o = document.createElement("option");
+      o.value = p; o.textContent = p;
+      personFilterEl.appendChild(o);
+    });
+  }
+
+  function recordsForView(){
+    var view = reportViewEl.value;
+    if(view === "role"){
+      if(!selectedRoleId) return null;
+      return records.filter(function(r){ return r.roleId === selectedRoleId; });
+    }
+    if(view === "all"){
+      return records.slice();
+    }
+    if(view === "deadlines"){
+      return records.filter(function(r){ return r.deadline && r.deadline.trim() !== ""; });
+    }
+    if(view === "by-person"){
+      var who = personFilterEl.value;
+      if(!who) return records.slice();
+      return records.filter(function(r){ return r.createdBy === who; });
+    }
+    return records.slice();
+  }
+
+  function renderRecordsPanel(){
+    var view = reportViewEl.value;
+    personFilterEl.style.display = (view === "by-person") ? "" : "none";
+
+    var rows = recordsForView();
+
+    if(view === "role"){
+      if(!selectedRoleId){
+        recordsTitle.textContent = "Records";
+        recordsSub.textContent = "Select a role above, or choose a report view.";
+        recordsList.innerHTML = '<li class="bc-empty">No role selected.</li>';
+        return;
+      }
+      recordsTitle.textContent = "Records — " + (GROUP_NAMES[selectedRoleId] || selectedRoleId);
+      recordsSub.textContent = rows.length + (rows.length === 1 ? " record" : " records") + " for this role.";
+    } else if(view === "all"){
+      recordsTitle.textContent = "All records";
+      recordsSub.textContent = rows.length + (rows.length === 1 ? " record" : " records") + " total.";
+    } else if(view === "deadlines"){
+      recordsTitle.textContent = "Records with a deadline";
+      recordsSub.textContent = rows.length + (rows.length === 1 ? " record" : " records") + " carrying a deadline.";
+    } else if(view === "by-person"){
+      recordsTitle.textContent = "Records by recorder";
+      recordsSub.textContent = rows.length + (rows.length === 1 ? " record" : " records") + (personFilterEl.value ? (" recorded by " + personFilterEl.value) : " across all recorders") + ".";
+    }
+
+    recordsList.innerHTML = "";
+    if(!rows || rows.length === 0){
+      recordsList.innerHTML = '<li class="bc-empty">No records to show.</li>';
+      return;
+    }
+    rows.slice().sort(function(a,b){ return (a.date||"") < (b.date||"") ? 1 : -1; }).forEach(function(r){
+      var li = document.createElement("li");
+      var metaBits = [];
+      if(view !== "role") metaBits.push('<span class="bc-rec-role">' + escapeHtml(GROUP_NAMES[r.roleId] || r.roleId) + "</span>");
+      if(r.date) metaBits.push(escapeHtml(r.date));
+      if(r.deadline) metaBits.push("deadline: " + escapeHtml(r.deadline));
+      if(r.createdBy) metaBits.push("recorded by " + escapeHtml(r.createdBy));
+      li.innerHTML =
+        '<div class="bc-rec-meta">' + metaBits.join(" &middot; ") + "</div>" +
+        "<div>" + escapeHtml(r.description) + "</div>";
+      recordsList.appendChild(li);
+    });
+  }
+
+  reportViewEl.addEventListener("change", renderRecordsPanel);
+  personFilterEl.addEventListener("change", renderRecordsPanel);
+
+  // ---------- Users table ----------
+  var usersToggle = document.getElementById("bc-users-toggle");
+  var usersWrap = document.getElementById("bc-users-table-wrap");
+  var usersBody = document.getElementById("bc-users-table-body");
+
+  function renderUsersTable(){
+    usersBody.innerHTML = "";
+    users.slice().sort(function(a,b){
+      return (a.name||"").toLowerCase() < (b.name||"").toLowerCase() ? -1 : 1;
+    }).forEach(function(u){
+      var groupNames = (u.groups || []).map(function(g){ return GROUP_NAMES[g] || g; });
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>" + escapeHtml(u.name) + (u.isAdmin ? ' <span class="bc-admin-flag">ADMIN</span>' : "") + "</td>" +
+        '<td class="bc-groups-cell">' + (groupNames.length ? escapeHtml(groupNames.join(", ")) : '<span class="bc-empty">none</span>') + "</td>";
+      usersBody.appendChild(tr);
+    });
+  }
+
+  var usersShown = false;
+  usersToggle.addEventListener("click", function(){
+    usersShown = !usersShown;
+    usersWrap.style.display = usersShown ? "" : "none";
+    usersToggle.textContent = usersShown ? "Hide" : "Show";
+  });
+
+  // ---------- init ----------
+  setupFilterOptions();
+  setupPersonOptions();
+  renderTable();
+  renderRecordsPanel();
+  renderUsersTable();
+})();
+</script>
+</body>
+</html>
